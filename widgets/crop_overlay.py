@@ -1,9 +1,12 @@
 from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QPainter, QPen, QColor
-from PySide6.QtCore import Qt, QRect, QPoint
+from PySide6.QtCore import Qt, QRect, QPoint, Signal
 
 
 class CropOverlay(QWidget):
+    cropRectChanged = Signal()
+    cropFinalized = Signal()
+
     def __init__(self, aspect_ratio=None, parent=None):
         super().__init__(parent)
 
@@ -22,7 +25,6 @@ class CropOverlay(QWidget):
     # Maus-Events
     # ---------------------------------------------------------
     def mousePressEvent(self, event):
-        # Rechtsklick → Reset
         if event.button() == Qt.RightButton:
             self.start_point = None
             self.current_point = None
@@ -31,56 +33,57 @@ class CropOverlay(QWidget):
             self.update()
             return
 
-        # Linksklick → Start oder Endpunkt
         if event.button() == Qt.LeftButton:
-            # Startpunkt setzen
             if not self.is_drawing:
                 self.start_point = event.pos()
                 self.current_point = event.pos()
                 self.final_point = None
                 self.is_drawing = True
             else:
-                # Endpunkt fixieren
                 self.final_point = self._apply_aspect_ratio(self.start_point, event.pos())
                 self.is_drawing = False
+                self.cropFinalized.emit()
 
             self.update()
 
     def mouseMoveEvent(self, event):
-        # Live-Zeichnen während der Nutzer die Maus bewegt
         if self.is_drawing and self.start_point:
             self.current_point = self._apply_aspect_ratio(self.start_point, event.pos())
+            self.cropRectChanged.emit()
             self.update()
 
     # ---------------------------------------------------------
-    # Seitenverhältnis erzwingen (optional)
+    # Photoshop-Style Ratio Enforcement
     # ---------------------------------------------------------
     def _apply_aspect_ratio(self, start: QPoint, current: QPoint):
-        if not self.aspect_ratio:
+        if not self.aspect_ratio or self.aspect_ratio == 0:
             return current
 
-        dx = current.x() - start.x()
-        dy = current.y() - start.y()
+        raw_dx = current.x() - start.x()
+        raw_dy = current.y() - start.y()
 
-        # Vorzeichen merken
-        sx = 1 if dx >= 0 else -1
-        sy = 1 if dy >= 0 else -1
 
-        adx = abs(dx)
-        ady = abs(dy)
+        sx = 1 if raw_dx >= 0 else -1
+        sy = 1 if raw_dy >= 0 else -1
 
-        if adx > ady:
-            ady = adx / self.aspect_ratio
+        adx = abs(raw_dx)
+        ady = abs(raw_dy)
+        r = self.aspect_ratio  # jetzt immer >= 1
+
+        # Orientierung NUR aus der Mausbewegung
+        if adx >= ady:
+            # Querformat
+            width = adx
+            height = width / r
         else:
-            adx = ady * self.aspect_ratio
+            # Hochformat
+            height = ady
+            width = height / r
 
-        # Vorzeichen wieder anwenden
-        dx = sx * adx
-        dy = sy * ady
+        dx = sx * width
+        dy = sy * height
 
         return QPoint(start.x() + dx, start.y() + dy)
-
-
 
     # ---------------------------------------------------------
     # Zeichnen
@@ -89,7 +92,6 @@ class CropOverlay(QWidget):
         if not self.start_point:
             return
 
-        # Während des Ziehens: current_point, nach Abschluss: final_point
         end = self.final_point if self.final_point else self.current_point
         if not end:
             return
@@ -101,13 +103,9 @@ class CropOverlay(QWidget):
 
         shade = QColor(0, 0, 0, 200)
 
-        # Oben
         painter.fillRect(0, 0, self.width(), rect.top(), shade)
-        # Unten
         painter.fillRect(0, rect.bottom(), self.width(), self.height() - rect.bottom(), shade)
-        # Links
         painter.fillRect(0, rect.top(), rect.left(), rect.height(), shade)
-        # Rechts
         painter.fillRect(rect.right(), rect.top(), self.width() - rect.right(), rect.height(), shade)
 
         pen = QPen(QColor(35, 115, 105), 2)
@@ -115,23 +113,35 @@ class CropOverlay(QWidget):
         painter.setPen(pen)
         painter.drawRect(rect)
 
-
     # ---------------------------------------------------------
     # Crop-Rect abrufen
     # ---------------------------------------------------------
-    #def get_crop_rect(self):
-    #    if not self.start_point:
-    #        return None
-    #
-    #    end = self.final_point if self.final_point else self.current_point
-    #    if not end:
-    #        return None
-    #
-    #    return QRect(self.start_point, end).normalized()
-    
-
     def get_crop_rect(self):
         if not self.final_point:
             return None
         return QRect(self.start_point, self.final_point).normalized()
 
+    def set_aspect_ratio(self, ratio):
+        if ratio is None:
+            ratio = 0
+        self.aspect_ratio = ratio
+
+    def set_crop_rect(self, rect: QRect):
+        """
+        Setzt die Crop-Boundingbox von außen (z.B. Auto-Detect).
+        """
+        if rect is None:
+            self.start_point = None
+            self.current_point = None
+            self.final_point = None
+            self.is_drawing = False
+            self.update()
+            return
+
+        self.start_point = rect.topLeft()
+        self.current_point = rect.bottomRight()
+        self.final_point = rect.bottomRight()
+        self.is_drawing = False
+
+        self.cropRectChanged.emit()
+        self.update()

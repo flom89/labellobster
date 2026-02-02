@@ -26,4 +26,4 @@ def render_pdf_page(path: str, zoom: float = 4.0):
     # KEINE Rotation hier!
     rotated = False
 
-    return image, page.rect, rotated
+    return image, page, page.rect, rotated
