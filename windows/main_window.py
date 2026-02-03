@@ -1,13 +1,8 @@
 from PySide6.QtWidgets import (
-    QMainWindow, QFileDialog, QVBoxLayout, QMessageBox, QLabel, QSizePolicy, QWidget
+    QMainWindow, QFileDialog, QVBoxLayout, QMessageBox, QLabel, QSizePolicy, 
 )
-from PySide6.QtPrintSupport import QPrinter, QPrintDialog
-from PySide6.QtGui import QPixmap, QPainter, QImage
 from PySide6.QtCore import Qt, QTimer, QRect
 import fitz
-from PySide6.QtPrintSupport import QPrintPreviewDialog, QPrinter
-from PySide6.QtGui import QPainter
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QGraphicsView, QGraphicsScene
 
 from forms.ui_mainwindow import Ui_MainWindow
 from widgets.pdf_viewer import PdfViewer
