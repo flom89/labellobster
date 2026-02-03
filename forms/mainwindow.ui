@@ -179,6 +179,19 @@
          </attribute>
          <layout class="QVBoxLayout" name="tab2Layout">
           <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <property name="sizeConstraint">
+             <enum>QLayout::SizeConstraint::SetFixedSize</enum>
+            </property>
+            <item>
+             <widget class="QComboBox" name="cmbPrinter"/>
+            </item>
+            <item>
+             <widget class="QComboBox" name="cmbOrientation"/>
+            </item>
+           </layout>
+          </item>
+          <item>
            <widget class="QFrame" name="pdfContainer_cropped">
             <property name="frameShape">
              <enum>QFrame::Shape::StyledPanel</enum>

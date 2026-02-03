@@ -1,19 +1,19 @@
 from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QPainter, QPen, QColor
-from PySide6.QtCore import Qt, QRect, QPoint, Signal
+from PySide6.QtCore import Qt, QRect, QPointF, Signal
 
 
 class CropOverlay(QWidget):
     cropRectChanged = Signal()
     cropFinalized = Signal()
 
-    def __init__(self, aspect_ratio=None, parent=None):
+    def __init__(self, aspect_ratio=None, parent=None, view=None):
         super().__init__(parent)
+        self.view = view
 
         self.aspect_ratio = aspect_ratio
-        self.start_point = None
-        self.current_point = None
-        self.final_point = None
+        self.scene_start = None      # Scene-Koordinaten
+        self.scene_end = None        # Scene-Koordinaten
         self.is_drawing = False
 
         self.setAttribute(Qt.WA_TransparentForMouseEvents, False)
@@ -22,81 +22,82 @@ class CropOverlay(QWidget):
         self.setMouseTracking(True)
 
     # ---------------------------------------------------------
-    # Maus-Events
+    # Maus-Events (arbeiten NUR in Scene-Koordinaten)
     # ---------------------------------------------------------
     def mousePressEvent(self, event):
+        scene_pos = self.view.mapToScene(event.position().toPoint())
+
         if event.button() == Qt.RightButton:
-            self.start_point = None
-            self.current_point = None
-            self.final_point = None
+            self.scene_start = None
+            self.scene_end = None
             self.is_drawing = False
             self.update()
             return
 
         if event.button() == Qt.LeftButton:
             if not self.is_drawing:
-                self.start_point = event.pos()
-                self.current_point = event.pos()
-                self.final_point = None
+                self.scene_start = scene_pos
+                self.scene_end = scene_pos
                 self.is_drawing = True
             else:
-                self.final_point = self._apply_aspect_ratio(self.start_point, event.pos())
+                self.scene_end = self._apply_aspect_ratio_scene(self.scene_start, scene_pos)
                 self.is_drawing = False
                 self.cropFinalized.emit()
 
             self.update()
 
     def mouseMoveEvent(self, event):
-        if self.is_drawing and self.start_point:
-            self.current_point = self._apply_aspect_ratio(self.start_point, event.pos())
-            self.cropRectChanged.emit()
-            self.update()
+        if not self.is_drawing or self.scene_start is None:
+            return
+
+        scene_pos = self.view.mapToScene(event.position().toPoint())
+        self.scene_end = self._apply_aspect_ratio_scene(self.scene_start, scene_pos)
+
+        self.cropRectChanged.emit()
+        self.update()
 
     # ---------------------------------------------------------
-    # Photoshop-Style Ratio Enforcement
+    # Ratio in Scene-Koordinaten
     # ---------------------------------------------------------
-    def _apply_aspect_ratio(self, start: QPoint, current: QPoint):
+    def _apply_aspect_ratio_scene(self, start: QPointF, current: QPointF):
         if not self.aspect_ratio or self.aspect_ratio == 0:
             return current
 
-        raw_dx = current.x() - start.x()
-        raw_dy = current.y() - start.y()
+        dx = current.x() - start.x()
+        dy = current.y() - start.y()
 
+        sx = 1 if dx >= 0 else -1
+        sy = 1 if dy >= 0 else -1
 
-        sx = 1 if raw_dx >= 0 else -1
-        sy = 1 if raw_dy >= 0 else -1
+        adx = abs(dx)
+        ady = abs(dy)
+        r = self.aspect_ratio
 
-        adx = abs(raw_dx)
-        ady = abs(raw_dy)
-        r = self.aspect_ratio  # jetzt immer >= 1
-
-        # Orientierung NUR aus der Mausbewegung
         if adx >= ady:
-            # Querformat
             width = adx
             height = width / r
         else:
-            # Hochformat
             height = ady
             width = height / r
 
-        dx = sx * width
-        dy = sy * height
-
-        return QPoint(start.x() + dx, start.y() + dy)
+        return QPointF(start.x() + sx * width, start.y() + sy * height)
 
     # ---------------------------------------------------------
-    # Zeichnen
+    # Zeichnen (Scene → Viewport → Overlay)
     # ---------------------------------------------------------
     def paintEvent(self, event):
-        if not self.start_point:
+        if self.scene_start is None or self.scene_end is None:
             return
 
-        end = self.final_point if self.final_point else self.current_point
-        if not end:
-            return
+        # Scene → Viewport
+        sp_view = self.view.mapFromScene(self.scene_start)
+        ep_view = self.view.mapFromScene(self.scene_end)
 
-        rect = QRect(self.start_point, end).normalized()
+        # Viewport → Overlay
+        sp = self.mapFromParent(sp_view)
+        ep = self.mapFromParent(ep_view)
+
+        rect = QRect(sp, ep).normalized()
 
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
@@ -114,34 +115,34 @@ class CropOverlay(QWidget):
         painter.drawRect(rect)
 
     # ---------------------------------------------------------
-    # Crop-Rect abrufen
+    # Crop-Rect in Scene-Koordinaten
     # ---------------------------------------------------------
     def get_crop_rect(self):
-        if not self.final_point:
+        if self.scene_start is None or self.scene_end is None:
             return None
-        return QRect(self.start_point, self.final_point).normalized()
+        return QRect(self.scene_start.toPoint(), self.scene_end.toPoint()).normalized()
 
     def set_aspect_ratio(self, ratio):
-        if ratio is None:
-            ratio = 0
-        self.aspect_ratio = ratio
+        self.aspect_ratio = ratio or 0
 
-    def set_crop_rect(self, rect: QRect):
-        """
-        Setzt die Crop-Boundingbox von außen (z.B. Auto-Detect).
-        """
+    def set_crop_rect(self, rect):
         if rect is None:
-            self.start_point = None
-            self.current_point = None
-            self.final_point = None
+            self.scene_start = None
+            self.scene_end = None
             self.is_drawing = False
             self.update()
             return
 
-        self.start_point = rect.topLeft()
-        self.current_point = rect.bottomRight()
-        self.final_point = rect.bottomRight()
+        self.scene_start = QPointF(rect.topLeft())
+        self.scene_end = QPointF(rect.bottomRight())
         self.is_drawing = False
 
         self.cropRectChanged.emit()
+        self.update()
+
+    # ---------------------------------------------------------
+    # Overlay-Geometrie aktualisieren (kein Re-Mapping nötig!)
+    # ---------------------------------------------------------
+    def update_overlay_geometry(self):
+        self.setGeometry(self.view.viewport().rect())
         self.update()

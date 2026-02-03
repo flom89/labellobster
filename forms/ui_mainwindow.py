@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'mainwindowgwtCkw.ui'
+## Form generated from reading UI file 'mainwindowOIHBnv.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.10.1
 ##
@@ -17,9 +17,10 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGroupBox,
-    QHBoxLayout, QLabel, QMainWindow, QMenu,
-    QMenuBar, QPushButton, QSizePolicy, QSpacerItem,
-    QStatusBar, QTabWidget, QVBoxLayout, QWidget)
+    QHBoxLayout, QLabel, QLayout, QMainWindow,
+    QMenu, QMenuBar, QPushButton, QSizePolicy,
+    QSpacerItem, QStatusBar, QTabWidget, QVBoxLayout,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -156,6 +157,22 @@ class Ui_MainWindow(object):
         self.tab_2.setObjectName(u"tab_2")
         self.tab2Layout = QVBoxLayout(self.tab_2)
         self.tab2Layout.setObjectName(u"tab2Layout")
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+        self.cmbPrinter = QComboBox(self.tab_2)
+        self.cmbPrinter.setObjectName(u"cmbPrinter")
+
+        self.horizontalLayout.addWidget(self.cmbPrinter)
+
+        self.cmbOrientation = QComboBox(self.tab_2)
+        self.cmbOrientation.setObjectName(u"cmbOrientation")
+
+        self.horizontalLayout.addWidget(self.cmbOrientation)
+
+
+        self.tab2Layout.addLayout(self.horizontalLayout)
+
         self.pdfContainer_cropped = QFrame(self.tab_2)
         self.pdfContainer_cropped.setObjectName(u"pdfContainer_cropped")
         self.pdfContainer_cropped.setFrameShape(QFrame.Shape.StyledPanel)

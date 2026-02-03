@@ -3,8 +3,11 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtPrintSupport import QPrinter, QPrintDialog
 from PySide6.QtGui import QPixmap, QPainter, QImage
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer, QRect
 import fitz
+from PySide6.QtPrintSupport import QPrintPreviewDialog, QPrinter
+from PySide6.QtGui import QPainter
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QGraphicsView, QGraphicsScene
 
 from forms.ui_mainwindow import Ui_MainWindow
 from widgets.pdf_viewer import PdfViewer
@@ -16,7 +19,7 @@ from db.ShippingLabelType_db import ShippingLabelTypeDB
 
 from windows.PaperManager import PaperManager
 from windows.SupplierLabelManager import SupplierLabelManager
-
+from modules.PrintPreviewDialog import PrintPreviewDialog
 from modules.transformer import Transformer
 
 
@@ -97,7 +100,7 @@ class MainWindow(QMainWindow):
         self.ui.actionClose.triggered.connect(self.close)
         self.ui.actionShowPaperManager.triggered.connect(self.show_paper_manager)
         self.ui.actionShowSupplierLabelManager.triggered.connect(self.show_supplier_label_manager)
-
+        self.ui.pdfContainer_cropped.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.pdf_viewer.overlay.cropFinalized.connect(self.update_preview)
 
         # Transformer wird erst gesetzt, wenn ein PDF geladen wurde
@@ -147,6 +150,34 @@ class MainWindow(QMainWindow):
         self.pdf_viewer.load_pdf(file_path)
         self.current_pdf_path = file_path
 
+    
+    def load_crop(self, supplier_label_id, paper_format_id):
+        row = self.crop_data_db.get(supplier_label_id, paper_format_id)
+        if not row:
+            return
+
+        pdf_rect = fitz.Rect(
+            row["crop_x0"],
+            row["crop_y0"],
+            row["crop_x1"],
+            row["crop_y1"]
+        )
+
+        # PDF → Pixmap
+        pixmap_rect = self.transformer.pdf_rect_to_scene_rect(pdf_rect)
+
+        # Pixmap → Scene
+        scene_rect = self.transformer.pixmap_item.mapToScene(pixmap_rect).boundingRect()
+
+        # Scene → View
+        view_rect = self.pdf_viewer.graphics_view.mapFromScene(scene_rect).boundingRect()
+
+        # View → Overlay
+        overlay_rect = self.pdf_viewer.overlay.mapFromParent(view_rect)
+
+        # Overlay setzen
+        self.pdf_viewer.overlay.set_crop_rect(overlay_rect)
+
     # ---------------------------------------------------------
     # Manueller Crop (Preview)
     # ---------------------------------------------------------
@@ -155,22 +186,18 @@ class MainWindow(QMainWindow):
             print("Kein PDF geladen.")
             return
 
-        widget_rect = self.pdf_viewer.overlay.get_crop_rect()
-        if widget_rect is None:
+        scene_rect = self.pdf_viewer.overlay.get_crop_rect()
+        if scene_rect is None:
             print("Keine Crop-Box gesetzt")
             return
 
-        pdf_rect = self.transformer.overlay_rect_to_pdf_rect(
-            self.pdf_viewer.overlay,
-            widget_rect
-        )
+        pdf_rect = self.transformer.scene_rect_to_pdf_rect(scene_rect)
         if pdf_rect is None:
             print("Konnte PDF-Rect nicht berechnen.")
             return
 
         self.update_preview()
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_2)
-
     # ---------------------------------------------------------
     # Update Preview
     # ---------------------------------------------------------
@@ -182,10 +209,9 @@ class MainWindow(QMainWindow):
         if rect is None:
             return
 
-        pdf_rect = self.transformer.overlay_rect_to_pdf_rect(
-            self.pdf_viewer.overlay,
-            rect
-        )
+        scene_rect = self.pdf_viewer.overlay.get_crop_rect()
+        pdf_rect = self.transformer.scene_rect_to_pdf_rect(scene_rect)
+
         if pdf_rect is None:
             return
 
@@ -221,19 +247,35 @@ class MainWindow(QMainWindow):
 
         for fmt in self.paper_format_db.list_all():
             label = f"{fmt.name} ({fmt.width_mm}×{fmt.height_mm})"
-            ratio = max(fmt.width_mm, fmt.height_mm) / min(fmt.width_mm, fmt.height_mm)
-            combo.addItem(label, ratio)
+            combo.addItem(label, fmt.id)   # <-- WICHTIG: ID speichern
 
+        # Standardauswahl
         if combo.count() > 1:
             combo.setCurrentIndex(1)
-            ratio = combo.itemData(1)
-            self.current_ratio = ratio
-            self.pdf_viewer.overlay.set_aspect_ratio(ratio)
+            fmt_id = combo.itemData(1)
+            fmt = self.paper_format_db.get_by_id(fmt_id)
+
+            if fmt:
+                ratio = max(fmt.width_mm, fmt.height_mm) / min(fmt.width_mm, fmt.height_mm)
+                self.current_ratio = ratio
+                self.pdf_viewer.overlay.set_aspect_ratio(ratio)
         else:
             self.current_ratio = None
 
     def _on_format_changed(self, index):
-        ratio = self.ui.cmbPaperType.itemData(index)
+        fmt_id = self.ui.cmbPaperType.itemData(index)
+
+        if fmt_id is None:
+            # Frei-Modus
+            self.current_ratio = None
+            self.pdf_viewer.overlay.set_aspect_ratio(None)
+            return
+
+        fmt = self.paper_format_db.get_by_id(fmt_id)
+        if not fmt:
+            return
+
+        ratio = max(fmt.width_mm, fmt.height_mm) / min(fmt.width_mm, fmt.height_mm)
         self.current_ratio = ratio
         self.pdf_viewer.overlay.set_aspect_ratio(ratio)
 
@@ -280,19 +322,33 @@ class MainWindow(QMainWindow):
             )
             return
 
-        widget_rect = self.pdf_viewer.overlay.get_crop_rect()
-        if widget_rect is None:
-            QMessageBox.warning(
-                self,
-                "Fehler",
-                "Keine Bounding-Box gesetzt."
-            )
+        # 1. Lokalen Rect holen (Overlay-Koordinaten)
+        local_rect = self.pdf_viewer.overlay.get_crop_rect()
+        if local_rect is None:
+            QMessageBox.warning(self, "Fehler", "Keine Bounding-Box gesetzt.")
             return
 
-        pdf_rect = self.transformer.overlay_rect_to_pdf_rect(
-            self.pdf_viewer.overlay,
-            widget_rect
-        )
+        # ---------------------------------------------------------
+        # 2. Overlay → View-Koordinaten (QWidget → QWidget)
+        # ---------------------------------------------------------
+        tl = self.pdf_viewer.overlay.mapToParent(local_rect.topLeft())
+        br = self.pdf_viewer.overlay.mapToParent(local_rect.bottomRight())
+        view_rect = QRect(tl, br).normalized()
+
+        # ---------------------------------------------------------
+        # 3. View → Scene-Koordinaten (QGraphicsView)
+        # ---------------------------------------------------------
+        scene_rect = self.pdf_viewer.graphics_view.mapToScene(view_rect).boundingRect()
+
+        # ---------------------------------------------------------
+        # 4. Scene → Pixmap-Koordinaten
+        # ---------------------------------------------------------
+        pixmap_rect = self.transformer.pixmap_item.mapFromScene(scene_rect).boundingRect()
+
+        # ---------------------------------------------------------
+        # 5. Pixmap → PDF-Koordinaten
+        # ---------------------------------------------------------
+        pdf_rect = self.transformer.scene_rect_to_pdf_rect(pixmap_rect)
         if pdf_rect is None:
             QMessageBox.warning(
                 self,
@@ -315,6 +371,7 @@ class MainWindow(QMainWindow):
             if reply == QMessageBox.No:
                 return
 
+        # 6. Speichern
         self.crop_data_db.add_or_update(
             supplier_label_id,
             paper_format_id,
@@ -389,57 +446,40 @@ class MainWindow(QMainWindow):
 
         self.pdf_viewer.overlay.setEnabled(True)
 
-        # Auto-Detect leicht verzögert starten, wenn gewünscht
+        # Auto-Detect zuerst
         QTimer.singleShot(0, self._auto_detect_crop)
 
     # ---------------------------------------------------------
     # Drucken
     # ---------------------------------------------------------
     def on_print_clicked(self):
-        if not self.transformer:
-            QMessageBox.warning(self, "Fehler", "Bitte zuerst ein PDF laden.")
-            return
-
-        widget_rect = self.pdf_viewer.overlay.get_crop_rect()
-        if widget_rect is None:
+        # Scene-Rect holen
+        scene_rect = self.pdf_viewer.overlay.get_crop_rect()
+        if scene_rect is None:
             QMessageBox.warning(self, "Fehler", "Keine Bounding-Box gesetzt.")
             return
 
-        pdf_rect = self.transformer.overlay_rect_to_pdf_rect(
-            self.pdf_viewer.overlay,
-            widget_rect
-        )
+        # Scene → PDF
+        pdf_rect = self.transformer.scene_rect_to_pdf_rect(scene_rect)
         if pdf_rect is None:
             QMessageBox.warning(self, "Fehler", "Konnte PDF-Bounding-Box nicht berechnen.")
             return
 
-        output_path = "cropped_final.pdf"
-        self.transformer.save_cropped_pdf(pdf_rect, output_path)
+        # Papierformat aus DB holen
+        fmt_id = self.ui.cmbPaperType.currentData()
+        fmt = self.paper_format_db.get_by_id(fmt_id)
 
-        self.print_pdf(output_path)
-
-    def print_pdf(self, path):
-        printer = QPrinter(QPrinter.HighResolution)
-        dialog = QPrintDialog(printer, self)
-
-        if dialog.exec() != QPrintDialog.Accepted:
+        if fmt is None:
+            QMessageBox.warning(self, "Fehler", "Ungültiges Papierformat ausgewählt.")
             return
 
-        doc = fitz.open(path)
-        page = doc.load_page(0)
-        pix = page.get_pixmap(dpi=300)
+        dpi = 300
+        width_px  = int(fmt.width_mm  / 25.4 * dpi)
+        height_px = int(fmt.height_mm / 25.4 * dpi)
 
-        img = QImage(
-            pix.samples,
-            pix.width,
-            pix.height,
-            pix.stride,
-            QImage.Format_RGBA8888 if pix.alpha else QImage.Format_RGB888
-        )
+        preview_img = self.transformer.render_cropped_image(pdf_rect, dpi=dpi)
+        preview_img = preview_img.scaled(width_px, height_px, Qt.KeepAspectRatio)
 
-        painter = QPainter(printer)
-        rect = painter.viewport()
+        dlg = PrintPreviewDialog(preview_img, fmt, dpi, self)
+        dlg.exec()
 
-        scaled = img.scaled(rect.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        painter.drawImage(rect, scaled)
-        painter.end()

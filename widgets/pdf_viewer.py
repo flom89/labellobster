@@ -36,7 +36,7 @@ class PdfViewer(QWidget):
         self.pdf_document = None
 
         # Overlay (Kind des Viewports)
-        self.overlay = CropOverlay(aspect_ratio=0, parent=self.graphics_view.viewport())
+        self.overlay = CropOverlay(aspect_ratio=0, parent=self.graphics_view.viewport(), view=self.graphics_view)
         self.overlay.setGeometry(self.graphics_view.viewport().rect())
         self.overlay.raise_()
         self.overlay.setEnabled(False)
@@ -47,7 +47,10 @@ class PdfViewer(QWidget):
     def resizeEvent(self, event):
         super().resizeEvent(event)
 
-        # FitInView NICHT direkt aufrufen → Endlosschleife
+        # Overlay sofort anpassen
+        self.overlay.update_overlay_geometry()
+
+        # FitInView erst nach Layout-Stabilisierung
         QTimer.singleShot(0, self._refit_after_resize)
 
     def _refit_after_resize(self):
@@ -117,3 +120,9 @@ class PdfViewer(QWidget):
 
         # FitInView erst nach Layout-Stabilisierung
         QTimer.singleShot(0, self._fit_view_initial)
+
+    def activate_overlay(self):
+        self.overlay.setEnabled(True)
+        self.overlay.setGeometry(self.graphics_view.viewport().rect())
+        self.overlay.raise_()
+        self.overlay.update()
