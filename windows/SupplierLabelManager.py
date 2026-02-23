@@ -1,23 +1,19 @@
 from PySide6.QtWidgets import QDialog, QTableWidgetItem, QMessageBox
 from forms.ui_SupplierLabelManager import Ui_SupplierLabelManager
+from db.ShippingLabelRepository import ShippingLabelRepository  # dein ORM-Repository
 
 
 class SupplierLabelManager(QDialog):
-    def __init__(self, def_db, format_db, parent=None):
+    def __init__(self, repo: ShippingLabelRepository, parent=None):
         super().__init__(parent)
 
         self.ui = Ui_SupplierLabelManager()
         self.ui.setupUi(self)
-
-        self.def_db = def_db
-        self.format_db = format_db
+        self.repo = repo
         self.current_id = None
 
         # Carrier-Liste füllen
         self._load_carriers()
-
-        # Format-Liste füllen
-        self._load_formats()
 
         # Tabelle füllen
         self._load_data()
@@ -27,7 +23,6 @@ class SupplierLabelManager(QDialog):
         self.ui.btnSave.clicked.connect(self._save)
         self.ui.btnDelete.clicked.connect(self._delete)
         self.ui.btnClose.clicked.connect(self.accept)
-
         self.ui.tableDefinitions.cellClicked.connect(self._on_row_selected)
 
     # ---------------------------------------------------------
@@ -47,31 +42,21 @@ class SupplierLabelManager(QDialog):
         self.ui.comboCarrier.addItems(carriers)
 
     # ---------------------------------------------------------
-    # Format-Liste
-    # ---------------------------------------------------------
-    def _load_formats(self):
-        self.ui.comboFormat.clear()
-        formats = self.format_db.list_all()
-
-        for fmt in formats:
-            label = f"{fmt.name} ({fmt.width_mm}×{fmt.height_mm})"
-            self.ui.comboFormat.addItem(label, fmt.id)
-
-    # ---------------------------------------------------------
     # Tabelle laden
     # ---------------------------------------------------------
     def _load_data(self):
-        rows = self.def_db.list_all()
+        rows = self.repo.list_all()
         table = self.ui.tableDefinitions
         table.setRowCount(len(rows))
 
         for row_idx, row in enumerate(rows):
-            item_carrier = QTableWidgetItem(row["carrier"])
-            item_carrier.setData(1000, row["id"])
+            # row ist jetzt ein ORM-Objekt (ShippingLabelType), kein dict
+            item_carrier = QTableWidgetItem(row.carrier)
+            item_carrier.setData(1000, row.id)
 
             table.setItem(row_idx, 0, item_carrier)
-            table.setItem(row_idx, 1, QTableWidgetItem(row["label_type"]))
-            table.setItem(row_idx, 2, QTableWidgetItem(row["keywords"]))
+            table.setItem(row_idx, 1, QTableWidgetItem(row.label_type))
+            table.setItem(row_idx, 2, QTableWidgetItem(row.keywords))
 
     # ---------------------------------------------------------
     # Zeile ausgewählt
@@ -83,20 +68,15 @@ class SupplierLabelManager(QDialog):
             return
 
         id = item.data(1000)
-        entry = self.def_db.get_by_id(id)
+        entry = self.repo.get_by_id(id)
         if not entry:
             return
 
         self.current_id = id
 
-        self.ui.comboCarrier.setCurrentText(entry["carrier"])
-        self.ui.editLabelType.setText(entry["label_type"])
-        self.ui.editKeywords.setText(entry["keywords"])
-
-        # Format auswählen
-        idx = self.ui.comboFormat.findData(entry["format_id"])
-        if idx >= 0:
-            self.ui.comboFormat.setCurrentIndex(idx)
+        self.ui.comboCarrier.setCurrentText(entry.carrier)
+        self.ui.editLabelType.setText(entry.label_type)
+        self.ui.editKeywords.setText(entry.keywords)
 
     # ---------------------------------------------------------
     # Neu
@@ -106,7 +86,6 @@ class SupplierLabelManager(QDialog):
         self.ui.comboCarrier.setCurrentIndex(0)
         self.ui.editLabelType.clear()
         self.ui.editKeywords.clear()
-        self.ui.comboFormat.setCurrentIndex(0)
         self.ui.tableDefinitions.clearSelection()
 
     # ---------------------------------------------------------
@@ -116,16 +95,15 @@ class SupplierLabelManager(QDialog):
         carrier = self.ui.comboCarrier.currentText()
         label_type = self.ui.editLabelType.text().strip()
         keywords = self.ui.editKeywords.text().strip()
-        format_id = self.ui.comboFormat.currentData()
 
         if not carrier or not label_type or not keywords:
             QMessageBox.warning(self, "Fehler", "Bitte alle Felder ausfüllen.")
             return
 
         if self.current_id is None:
-            self.def_db.add(carrier, label_type, keywords, format_id)
+            self.repo.add(carrier, label_type, keywords)
         else:
-            self.def_db.update(self.current_id, carrier, label_type, keywords, format_id)
+            self.repo.update(self.current_id, carrier, label_type, keywords)
 
         self._load_data()
         self._new()
@@ -137,6 +115,6 @@ class SupplierLabelManager(QDialog):
         if self.current_id is None:
             return
 
-        self.def_db.delete(self.current_id)
+        self.repo.delete(self.current_id)
         self._load_data()
         self._new()

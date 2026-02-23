@@ -1,26 +1,20 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'mainwindowOIHBnv.ui'
+## Form generated from reading UI file 'mainwindowdwEiuK.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.1
+## Created by: Qt User Interface Compiler version 6.10.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
-    QCursor, QFont, QFontDatabase, QGradient,
-    QIcon, QImage, QKeySequence, QLinearGradient,
-    QPainter, QPalette, QPixmap, QRadialGradient,
-    QTransform)
-from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGroupBox,
-    QHBoxLayout, QLabel, QLayout, QMainWindow,
-    QMenu, QMenuBar, QPushButton, QSizePolicy,
-    QSpacerItem, QStatusBar, QTabWidget, QVBoxLayout,
-    QWidget)
+from PySide6.QtCore import (QCoreApplication, QMetaObject, QRect,
+                            Qt)
+from PySide6.QtGui import (QAction)
+from PySide6.QtWidgets import (QComboBox, QGraphicsView, QGroupBox,
+                               QHBoxLayout, QLabel, QMenu,
+                               QMenuBar, QPushButton, QSizePolicy, QSpacerItem,
+                               QStatusBar, QTabWidget, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -47,15 +41,26 @@ class Ui_MainWindow(object):
         self.groupBox.setObjectName(u"groupBox")
         self.layoutGroup1 = QVBoxLayout(self.groupBox)
         self.layoutGroup1.setObjectName(u"layoutGroup1")
+        self.label_2 = QLabel(self.groupBox)
+        self.label_2.setObjectName(u"label_2")
+
+        self.layoutGroup1.addWidget(self.label_2)
+
+        self.cmbPrinterSlection = QComboBox(self.groupBox)
+        self.cmbPrinterSlection.setObjectName(u"cmbPrinterSlection")
+        self.cmbPrinterSlection.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
+
+        self.layoutGroup1.addWidget(self.cmbPrinterSlection)
+
         self.paper_format = QLabel(self.groupBox)
         self.paper_format.setObjectName(u"paper_format")
 
         self.layoutGroup1.addWidget(self.paper_format)
 
-        self.cmbPaperType = QComboBox(self.groupBox)
-        self.cmbPaperType.setObjectName(u"cmbPaperType")
+        self.cmbPrinterPaperSelection = QComboBox(self.groupBox)
+        self.cmbPrinterPaperSelection.setObjectName(u"cmbPrinterPaperSelection")
 
-        self.layoutGroup1.addWidget(self.cmbPaperType)
+        self.layoutGroup1.addWidget(self.cmbPrinterPaperSelection)
 
         self.label = QLabel(self.groupBox)
         self.label.setObjectName(u"label")
@@ -66,6 +71,26 @@ class Ui_MainWindow(object):
         self.cmbShippingLabelType.setObjectName(u"cmbShippingLabelType")
 
         self.layoutGroup1.addWidget(self.cmbShippingLabelType)
+
+        self.lblSizeLabel = QLabel(self.groupBox)
+        self.lblSizeLabel.setObjectName(u"lblSizeLabel")
+
+        self.layoutGroup1.addWidget(self.lblSizeLabel)
+
+        self.lblLabelSize = QLabel(self.groupBox)
+        self.lblLabelSize.setObjectName(u"lblLabelSize")
+
+        self.layoutGroup1.addWidget(self.lblLabelSize)
+
+        self.lblRatioLabel = QLabel(self.groupBox)
+        self.lblRatioLabel.setObjectName(u"lblRatioLabel")
+
+        self.layoutGroup1.addWidget(self.lblRatioLabel)
+
+        self.lblRatio = QLabel(self.groupBox)
+        self.lblRatio.setObjectName(u"lblRatio")
+
+        self.layoutGroup1.addWidget(self.lblRatio)
 
 
         self.leftColumn.addWidget(self.groupBox)
@@ -79,25 +104,8 @@ class Ui_MainWindow(object):
 
         self.layoutGroup3.addWidget(self.btnSaveCrop)
 
-        self.btnAutoCrop = QPushButton(self.groupBox_3)
-        self.btnAutoCrop.setObjectName(u"btnAutoCrop")
-
-        self.layoutGroup3.addWidget(self.btnAutoCrop)
-
 
         self.leftColumn.addWidget(self.groupBox_3)
-
-        self.groupBox_2 = QGroupBox(self.centralwidget)
-        self.groupBox_2.setObjectName(u"groupBox_2")
-        self.layoutGroup2 = QVBoxLayout(self.groupBox_2)
-        self.layoutGroup2.setObjectName(u"layoutGroup2")
-        self.btnManualCrop = QPushButton(self.groupBox_2)
-        self.btnManualCrop.setObjectName(u"btnManualCrop")
-
-        self.layoutGroup2.addWidget(self.btnManualCrop)
-
-
-        self.leftColumn.addWidget(self.groupBox_2)
 
         self.groupBox_4 = QGroupBox(self.centralwidget)
         self.groupBox_4.setObjectName(u"groupBox_4")
@@ -113,22 +121,8 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.btnPrint)
 
-        self.btnPrintsettings = QPushButton(self.groupBox_4)
-        self.btnPrintsettings.setObjectName(u"btnPrintsettings")
-
-        self.verticalLayout.addWidget(self.btnPrintsettings)
-
 
         self.leftColumn.addWidget(self.groupBox_4)
-
-        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.leftColumn.addItem(self.verticalSpacer_2)
-
-        self.lblAutoDetectIndicator = QLabel(self.centralwidget)
-        self.lblAutoDetectIndicator.setObjectName(u"lblAutoDetectIndicator")
-
-        self.leftColumn.addWidget(self.lblAutoDetectIndicator)
 
         self.verticalSpacer = QSpacerItem(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -145,41 +139,12 @@ class Ui_MainWindow(object):
         self.tab.setObjectName(u"tab")
         self.tab1Layout = QVBoxLayout(self.tab)
         self.tab1Layout.setObjectName(u"tab1Layout")
-        self.pdfContainer = QFrame(self.tab)
-        self.pdfContainer.setObjectName(u"pdfContainer")
-        self.pdfContainer.setCursor(QCursor(Qt.CursorShape.CrossCursor))
-        self.pdfContainer.setFrameShape(QFrame.Shape.StyledPanel)
+        self.graphicsViewImportedLabel = QGraphicsView(self.tab)
+        self.graphicsViewImportedLabel.setObjectName(u"graphicsViewImportedLabel")
 
-        self.tab1Layout.addWidget(self.pdfContainer)
+        self.tab1Layout.addWidget(self.graphicsViewImportedLabel)
 
         self.tabWidget.addTab(self.tab, "")
-        self.tab_2 = QWidget()
-        self.tab_2.setObjectName(u"tab_2")
-        self.tab2Layout = QVBoxLayout(self.tab_2)
-        self.tab2Layout.setObjectName(u"tab2Layout")
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
-        self.cmbPrinter = QComboBox(self.tab_2)
-        self.cmbPrinter.setObjectName(u"cmbPrinter")
-
-        self.horizontalLayout.addWidget(self.cmbPrinter)
-
-        self.cmbOrientation = QComboBox(self.tab_2)
-        self.cmbOrientation.setObjectName(u"cmbOrientation")
-
-        self.horizontalLayout.addWidget(self.cmbOrientation)
-
-
-        self.tab2Layout.addLayout(self.horizontalLayout)
-
-        self.pdfContainer_cropped = QFrame(self.tab_2)
-        self.pdfContainer_cropped.setObjectName(u"pdfContainer_cropped")
-        self.pdfContainer_cropped.setFrameShape(QFrame.Shape.StyledPanel)
-
-        self.tab2Layout.addWidget(self.pdfContainer_cropped)
-
-        self.tabWidget.addTab(self.tab_2, "")
 
         self.rightColumn.addWidget(self.tabWidget)
 
@@ -204,7 +169,6 @@ class Ui_MainWindow(object):
         self.menuDatei.addAction(self.actionImportShippingSlip)
         self.menuDatei.addSeparator()
         self.menuDatei.addAction(self.actionClose)
-        self.menuEinstellungen.addAction(self.actionShowPaperManager)
         self.menuEinstellungen.addAction(self.actionShowSupplierLabelManager)
 
         self.retranslateUi(MainWindow)
@@ -223,19 +187,18 @@ class Ui_MainWindow(object):
         self.actionImportShippingSlip.setText(QCoreApplication.translate("MainWindow", u"Versandlabel importieren", None))
         self.actionClose.setText(QCoreApplication.translate("MainWindow", u"Beenden", None))
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"Drucken und Labelformat", None))
-        self.paper_format.setText(QCoreApplication.translate("MainWindow", u"Papierformat", None))
+        self.label_2.setText(QCoreApplication.translate("MainWindow", u"Druckerauswahl", None))
+        self.paper_format.setText(QCoreApplication.translate("MainWindow", u"Drucker Papierformat", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Versandlabeltyp", None))
+        self.lblSizeLabel.setText(QCoreApplication.translate("MainWindow", u"Labelgr\u00f6\u00dfe", None))
+        self.lblLabelSize.setText("")
+        self.lblRatioLabel.setText(QCoreApplication.translate("MainWindow", u"Seitenverh\u00e4ltnis", None))
+        self.lblRatio.setText("")
         self.groupBox_3.setTitle(QCoreApplication.translate("MainWindow", u"Automatik", None))
         self.btnSaveCrop.setText(QCoreApplication.translate("MainWindow", u"Als Standard Speichern", None))
-        self.btnAutoCrop.setText(QCoreApplication.translate("MainWindow", u"Automatisches Beschneiden", None))
-        self.groupBox_2.setTitle(QCoreApplication.translate("MainWindow", u"Manuel", None))
-        self.btnManualCrop.setText(QCoreApplication.translate("MainWindow", u"Beschneiden", None))
         self.groupBox_4.setTitle(QCoreApplication.translate("MainWindow", u"Drucken", None))
         self.btnPrint.setText(QCoreApplication.translate("MainWindow", u"Drucken", None))
-        self.btnPrintsettings.setText(QCoreApplication.translate("MainWindow", u"Druckeinstellungen", None))
-        self.lblAutoDetectIndicator.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"Originales Versandlabel", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("MainWindow", u"Bearbeitetes Versandlabel", None))
         self.menuDatei.setTitle(QCoreApplication.translate("MainWindow", u"Datei", None))
         self.menuEinstellungen.setTitle(QCoreApplication.translate("MainWindow", u"Einstellungen", None))
     # retranslateUi

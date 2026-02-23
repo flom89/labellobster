@@ -1,38 +1,36 @@
-from dataclasses import dataclass
+# models.py
+from sqlalchemy.orm import registry, relationship
+from sqlalchemy import Column, Integer, String, Float, ForeignKey
 
-# -----------------------------
-# Paper Format (paper_formats)
-# -----------------------------
-@dataclass
-class PaperFormat:
-    id: int
-    name: str
-    width_mm: float
-    height_mm: float
+mapper_registry = registry()
 
 
-# -----------------------------
-# Shipping Label Type (ShippingLabelType_definitions)
-# -----------------------------
-@dataclass
+@mapper_registry.mapped
 class ShippingLabelType:
-    id: int
-    carrier: str
-    label_type: str
-    keywords: str
-    format_id: int
+    __tablename__ = "shipping_label_type"
+
+    id = Column(Integer, primary_key=True)
+    carrier = Column(String)
+    label_type = Column(String)
+    keywords = Column(String)
+
+    crops = relationship("CropData", back_populates="label")
 
 
-# -----------------------------
-# Crop Data (crop_data)
-# -----------------------------
-@dataclass
+@mapper_registry.mapped
 class CropData:
-    id: int
-    supplier_label_id: int
-    paper_format_id: int
-    crop_x0: float
-    crop_y0: float
-    crop_x1: float
-    crop_y1: float
-    rotation: int
+    __tablename__ = "crop_data"
+
+    id = Column(Integer, primary_key=True)
+    supplier_label_id = Column(Integer, ForeignKey("shipping_label_type.id"))
+
+    printer_name = Column(String)
+    paper_format_name = Column(String)
+
+    crop_x0 = Column(Float)
+    crop_y0 = Column(Float)
+    crop_x1 = Column(Float)
+    crop_y1 = Column(Float)
+    rotation = Column(Integer)
+
+    label = relationship("ShippingLabelType", back_populates="crops")
