@@ -1,6 +1,5 @@
 import qt_themes
 from PySide6 import QtWidgets
-
 from windows.main_window import MainWindow
 
 if __name__ == "__main__":

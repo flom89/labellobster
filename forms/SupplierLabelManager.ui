@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>650</width>
+    <width>908</width>
     <height>350</height>
    </rect>
   </property>
@@ -33,6 +33,21 @@
        <property name="columnCount">
         <number>3</number>
        </property>
+       <attribute name="horizontalHeaderCascadingSectionResizes">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="horizontalHeaderMinimumSectionSize">
+        <number>50</number>
+       </attribute>
+       <attribute name="horizontalHeaderDefaultSectionSize">
+        <number>135</number>
+       </attribute>
+       <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="horizontalHeaderStretchLastSection">
+        <bool>false</bool>
+       </attribute>
        <column>
         <property name="text">
          <string>Logistikunternehmen</string>

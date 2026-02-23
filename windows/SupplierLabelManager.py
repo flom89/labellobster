@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QDialog, QTableWidgetItem, QMessageBox
 from forms.ui_SupplierLabelManager import Ui_SupplierLabelManager
-from db.ShippingLabelRepository import ShippingLabelRepository  # dein ORM-Repository
+from db.shipping_label_repository import ShippingLabelRepository  # dein ORM-Repository
 
 
 class SupplierLabelManager(QDialog):
