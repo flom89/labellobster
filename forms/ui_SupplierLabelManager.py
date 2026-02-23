@@ -1,23 +1,30 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'SupplierLabelManagerpIoSvN.ui'
+## Form generated from reading UI file 'SupplierLabelManagerFKHCUs.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.10.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QMetaObject)
-from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QFormLayout, QHBoxLayout, QLabel,
-                               QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
-                               QTableWidget, QTableWidgetItem, QVBoxLayout)
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QDialog,
+    QFormLayout, QHBoxLayout, QHeaderView, QLabel,
+    QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
+    QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
 class Ui_SupplierLabelManager(object):
     def setupUi(self, SupplierLabelManager):
         if not SupplierLabelManager.objectName():
             SupplierLabelManager.setObjectName(u"SupplierLabelManager")
-        SupplierLabelManager.resize(650, 350)
+        SupplierLabelManager.resize(908, 350)
         self.verticalLayout_main = QVBoxLayout(SupplierLabelManager)
         self.verticalLayout_main.setObjectName(u"verticalLayout_main")
         self.horizontalLayout_center = QHBoxLayout()
@@ -37,6 +44,11 @@ class Ui_SupplierLabelManager(object):
         self.tableDefinitions.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.tableDefinitions.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.tableDefinitions.setColumnCount(3)
+        self.tableDefinitions.horizontalHeader().setCascadingSectionResizes(False)
+        self.tableDefinitions.horizontalHeader().setMinimumSectionSize(50)
+        self.tableDefinitions.horizontalHeader().setDefaultSectionSize(135)
+        self.tableDefinitions.horizontalHeader().setProperty(u"showSortIndicator", False)
+        self.tableDefinitions.horizontalHeader().setStretchLastSection(False)
 
         self.horizontalLayout_center.addWidget(self.tableDefinitions)
 

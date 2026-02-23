@@ -1,26 +1,34 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'mainwindowdwEiuK.ui'
+## Form generated from reading UI file 'mainwindowlzsLQd.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.10.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QMetaObject, QRect,
-                            Qt)
-from PySide6.QtGui import (QAction)
-from PySide6.QtWidgets import (QComboBox, QGraphicsView, QGroupBox,
-                               QHBoxLayout, QLabel, QMenu,
-                               QMenuBar, QPushButton, QSizePolicy, QSpacerItem,
-                               QStatusBar, QTabWidget, QVBoxLayout, QWidget)
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
+    QCursor, QFont, QFontDatabase, QGradient,
+    QIcon, QImage, QKeySequence, QLinearGradient,
+    QPainter, QPalette, QPixmap, QRadialGradient,
+    QTransform)
+from PySide6.QtWidgets import (QApplication, QComboBox, QGraphicsView, QGroupBox,
+    QHBoxLayout, QLabel, QMainWindow, QMenu,
+    QMenuBar, QPushButton, QSizePolicy, QSpacerItem,
+    QStatusBar, QTabWidget, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1200, 700)
+        icon = QIcon()
+        icon.addFile(u"../hummer.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        MainWindow.setWindowIcon(icon)
         self.actionLabelmanager = QAction(MainWindow)
         self.actionLabelmanager.setObjectName(u"actionLabelmanager")
         self.actionShowPaperManager = QAction(MainWindow)
@@ -31,6 +39,8 @@ class Ui_MainWindow(object):
         self.actionImportShippingSlip.setObjectName(u"actionImportShippingSlip")
         self.actionClose = QAction(MainWindow)
         self.actionClose.setObjectName(u"actionClose")
+        self.actionLizenz = QAction(MainWindow)
+        self.actionLizenz.setObjectName(u"actionLizenz")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.mainLayout = QHBoxLayout(self.centralwidget)
@@ -159,6 +169,8 @@ class Ui_MainWindow(object):
         self.menuDatei.setObjectName(u"menuDatei")
         self.menuEinstellungen = QMenu(self.menubar)
         self.menuEinstellungen.setObjectName(u"menuEinstellungen")
+        self.menuInfo = QMenu(self.menubar)
+        self.menuInfo.setObjectName(u"menuInfo")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -166,10 +178,12 @@ class Ui_MainWindow(object):
 
         self.menubar.addAction(self.menuDatei.menuAction())
         self.menubar.addAction(self.menuEinstellungen.menuAction())
+        self.menubar.addAction(self.menuInfo.menuAction())
         self.menuDatei.addAction(self.actionImportShippingSlip)
         self.menuDatei.addSeparator()
         self.menuDatei.addAction(self.actionClose)
         self.menuEinstellungen.addAction(self.actionShowSupplierLabelManager)
+        self.menuInfo.addAction(self.actionLizenz)
 
         self.retranslateUi(MainWindow)
 
@@ -186,6 +200,7 @@ class Ui_MainWindow(object):
         self.actionShowSupplierLabelManager.setText(QCoreApplication.translate("MainWindow", u"Versandlabels konfigurieren", None))
         self.actionImportShippingSlip.setText(QCoreApplication.translate("MainWindow", u"Versandlabel importieren", None))
         self.actionClose.setText(QCoreApplication.translate("MainWindow", u"Beenden", None))
+        self.actionLizenz.setText(QCoreApplication.translate("MainWindow", u"Lizenz", None))
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"Drucken und Labelformat", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Druckerauswahl", None))
         self.paper_format.setText(QCoreApplication.translate("MainWindow", u"Drucker Papierformat", None))
@@ -201,5 +216,6 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"Originales Versandlabel", None))
         self.menuDatei.setTitle(QCoreApplication.translate("MainWindow", u"Datei", None))
         self.menuEinstellungen.setTitle(QCoreApplication.translate("MainWindow", u"Einstellungen", None))
+        self.menuInfo.setTitle(QCoreApplication.translate("MainWindow", u"Info", None))
     # retranslateUi
 
