@@ -1,19 +1,46 @@
+import os
+
 import fitz
-from PySide6.QtCore import QSettings, QEvent
+from PySide6.QtCore import QSettings, QEvent, QUrl
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (
     QMainWindow, QFileDialog, QGraphicsScene
 )
 from PySide6.QtWidgets import QMessageBox, QFrame
 
-from db.CropDataRepository import CropDataRepository
-from db.ShippingLabelRepository import ShippingLabelRepository
+from db.crop_data_repository import CropDataRepository
+from db.shipping_label_repository import ShippingLabelRepository
 from db.database import get_session
 from forms.ui_mainwindow import Ui_MainWindow
 from modules.print import PrintingSystem
-from pdf_renderer import PDFRenderer
+from modules.pdf_renderer import PDFRenderer
 from widgets.widgets import AspectBox, DimOverlay
 from windows.SupplierLabelManager import SupplierLabelManager
+
+
+def open_license():
+    # Pfad zum aktuellen Skript (z.B. .../mein_projekt/src/main.py)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Gehe eine Ebene nach oben ins Stammverzeichnis (.../mein_projekt/)
+    project_root = os.path.dirname(current_dir)
+
+    # Pfad zur Lizenz im Stammverzeichnis zusammenbauen
+    # Ändere "LICENSE.txt.txt" falls deine Datei anders heißt
+    file_path = os.path.join(project_root, "LICENSE.txt")
+
+    if os.path.exists(file_path):
+        url = QUrl.fromLocalFile(file_path)
+        QDesktopServices.openUrl(url)
+    else:
+        # Hilfreich zum Debuggen: Wo genau sucht er?
+        print(f"Fehler: Datei nicht gefunden unter {file_path}")
+
+
+
+
+
 
 
 class MainWindow(QMainWindow):
@@ -76,10 +103,9 @@ class MainWindow(QMainWindow):
         self.ui.graphicsViewImportedLabel.viewport().installEventFilter(self)
         self.ui.cmbPrinterSlection.currentTextChanged.connect(self.update_crop_box_ratio)
         self.ui.cmbPrinterPaperSelection.currentTextChanged.connect(self.update_crop_box_ratio)
+        self.ui.actionLizenz.triggered.connect(open_license)
 
         self.update_crop_box_ratio()
-
-
 
     def show_supplier_label_manager(self):
         dlg = SupplierLabelManager(self.label_repo)
