@@ -1,24 +1,17 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'SupplierLabelManagerzrqEFO.ui'
+## Form generated from reading UI file 'SupplierLabelManagerpIoSvN.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.1
+## Created by: Qt User Interface Compiler version 6.10.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QDialog,
-    QFormLayout, QHBoxLayout, QHeaderView, QLabel,
-    QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
-    QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
+from PySide6.QtCore import (QCoreApplication, QMetaObject)
+from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QFormLayout, QHBoxLayout, QLabel,
+                               QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
+                               QTableWidget, QTableWidgetItem, QVBoxLayout)
 
 class Ui_SupplierLabelManager(object):
     def setupUi(self, SupplierLabelManager):
@@ -79,16 +72,6 @@ class Ui_SupplierLabelManager(object):
 
         self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.editKeywords)
 
-        self.labelFormat = QLabel(SupplierLabelManager)
-        self.labelFormat.setObjectName(u"labelFormat")
-
-        self.formLayout.setWidget(3, QFormLayout.ItemRole.LabelRole, self.labelFormat)
-
-        self.comboFormat = QComboBox(SupplierLabelManager)
-        self.comboFormat.setObjectName(u"comboFormat")
-
-        self.formLayout.setWidget(3, QFormLayout.ItemRole.FieldRole, self.comboFormat)
-
 
         self.horizontalLayout_center.addLayout(self.formLayout)
 
@@ -141,7 +124,6 @@ class Ui_SupplierLabelManager(object):
         self.labelCarrier.setText(QCoreApplication.translate("SupplierLabelManager", u"Logistikunternehmen:", None))
         self.labelLabelType.setText(QCoreApplication.translate("SupplierLabelManager", u"Labeltyp:", None))
         self.labelKeywords.setText(QCoreApplication.translate("SupplierLabelManager", u"Keywords (kommagetrennt):", None))
-        self.labelFormat.setText(QCoreApplication.translate("SupplierLabelManager", u"Zugeh\u00f6riges Format:", None))
         self.btnNew.setText(QCoreApplication.translate("SupplierLabelManager", u"Neu", None))
         self.btnSave.setText(QCoreApplication.translate("SupplierLabelManager", u"Speichern", None))
         self.btnDelete.setText(QCoreApplication.translate("SupplierLabelManager", u"L\u00f6schen", None))

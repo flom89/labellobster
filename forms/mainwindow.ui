@@ -24,14 +24,28 @@
         </property>
         <layout class="QVBoxLayout" name="layoutGroup1">
          <item>
-          <widget class="QLabel" name="paper_format">
+          <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>Papierformat</string>
+            <string>Druckerauswahl</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="cmbPaperType"/>
+          <widget class="QComboBox" name="cmbPrinterSlection">
+           <property name="contextMenuPolicy">
+            <enum>Qt::ContextMenuPolicy::NoContextMenu</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="paper_format">
+           <property name="text">
+            <string>Drucker Papierformat</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="cmbPrinterPaperSelection"/>
          </item>
          <item>
           <widget class="QLabel" name="label">
@@ -42,6 +56,34 @@
          </item>
          <item>
           <widget class="QComboBox" name="cmbShippingLabelType"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblSizeLabel">
+           <property name="text">
+            <string>Labelgröße</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblLabelSize">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblRatioLabel">
+           <property name="text">
+            <string>Seitenverhältnis</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblRatio">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -56,29 +98,6 @@
           <widget class="QPushButton" name="btnSaveCrop">
            <property name="text">
             <string>Als Standard Speichern</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="btnAutoCrop">
-           <property name="text">
-            <string>Automatisches Beschneiden</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QGroupBox" name="groupBox_2">
-        <property name="title">
-         <string>Manuel</string>
-        </property>
-        <layout class="QVBoxLayout" name="layoutGroup2">
-         <item>
-          <widget class="QPushButton" name="btnManualCrop">
-           <property name="text">
-            <string>Beschneiden</string>
            </property>
           </widget>
          </item>
@@ -104,34 +123,7 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QPushButton" name="btnPrintsettings">
-           <property name="text">
-            <string>Druckeinstellungen</string>
-           </property>
-          </widget>
-         </item>
         </layout>
-       </widget>
-      </item>
-      <item>
-       <spacer name="verticalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Orientation::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QLabel" name="lblAutoDetectIndicator">
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
        </widget>
       </item>
       <item>
@@ -162,41 +154,7 @@
          </attribute>
          <layout class="QVBoxLayout" name="tab1Layout">
           <item>
-           <widget class="QFrame" name="pdfContainer">
-            <property name="cursor">
-             <cursorShape>CrossCursor</cursorShape>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::Shape::StyledPanel</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="tab_2">
-         <attribute name="title">
-          <string>Bearbeitetes Versandlabel</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="tab2Layout">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <property name="sizeConstraint">
-             <enum>QLayout::SizeConstraint::SetFixedSize</enum>
-            </property>
-            <item>
-             <widget class="QComboBox" name="cmbPrinter"/>
-            </item>
-            <item>
-             <widget class="QComboBox" name="cmbOrientation"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QFrame" name="pdfContainer_cropped">
-            <property name="frameShape">
-             <enum>QFrame::Shape::StyledPanel</enum>
-            </property>
-           </widget>
+           <widget class="QGraphicsView" name="graphicsViewImportedLabel"/>
           </item>
          </layout>
         </widget>
@@ -227,7 +185,6 @@
     <property name="title">
      <string>Einstellungen</string>
     </property>
-    <addaction name="actionShowPaperManager"/>
     <addaction name="actionShowSupplierLabelManager"/>
    </widget>
    <addaction name="menuDatei"/>
